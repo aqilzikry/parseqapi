@@ -8,13 +8,16 @@ from strhub.data.module import SceneTextDataModule
 
 app = Flask(__name__)
 
+
 @app.route('/predict', methods=['POST'])
 def predict():
-    img_file = request.files['image']  # get the image file from the request
+    encoded_image = request.form['image']  # get the base64-encoded image string from the request
     parseq = torch.hub.load('baudm/parseq', 'parseq', pretrained=True).eval()
     img_transform = SceneTextDataModule.get_transform([32, 128])
 
-    img = Image.open(img_file).convert('RGB')  # convert the file to an Image object
+    img_bytes = base64.b64decode(encoded_image)  # decode the base64-encoded image string to bytes
+    img = Image.open(BytesIO(img_bytes)).convert('RGB')  # convert the bytes to an Image object
+
     img = img_transform(img).unsqueeze(0)
 
     logits = parseq(img)
