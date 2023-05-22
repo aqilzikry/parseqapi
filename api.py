@@ -34,7 +34,7 @@ def predict(param):
     print('Decoded label = {}'.format(label[0]))
     # Do something with the image file, like process it with a model
     # and return the prediction result as a response
-    return jsonify({'result': label[0]})
+    return jsonify({'label': label[0]})
 
 
 if __name__ == '__main__':
