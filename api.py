@@ -1,18 +1,24 @@
 import base64
-from io import BytesIO
 import torch
 
+from io import BytesIO
 from flask import Flask, request, jsonify
 from PIL import Image
 from strhub.data.module import SceneTextDataModule
+from strhub.models.utils import load_from_checkpoint
 
 app = Flask(__name__)
 
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/predict-<param>', methods=['POST'])
+def predict(param):
     encoded_image = request.form['image']  # get the base64-encoded image string from the request
-    parseq = torch.hub.load('baudm/parseq', 'parseq', pretrained=True).eval()
+
+    if (param == 'pt'):
+      parseq = torch.load('custom_model.pt')
+    else:
+      parseq = torch.hub.load('baudm/parseq', 'parseq', pretrained=True).eval()
+
     img_transform = SceneTextDataModule.get_transform([32, 128])
 
     img_bytes = base64.b64decode(encoded_image)  # decode the base64-encoded image string to bytes
